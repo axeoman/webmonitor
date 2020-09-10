@@ -1,4 +1,4 @@
-"""Container for WebCheck class and its models"""
+"""Container for WebChecker class and its models"""
 from dataclasses import dataclass, asdict
 from typing import Optional
 import logging
@@ -17,9 +17,14 @@ class WebCheckResult:
     regexp: Optional[str] = None
     regexp_matched: Optional[bool] = None
 
-    def json(self) -> str:
-        """Serialize result into json"""
+    def dumps(self) -> str:
+        """Serialize WebCheckResult into json"""
         return json.dumps(asdict(self))
+
+    @classmethod
+    def loads(cls, message: str) -> "WebCheckResult":
+        """Deserialize json into WebCheckResult objects"""
+        return WebCheckResult(**json.loads(message))
 
 
 class WebChecker:

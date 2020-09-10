@@ -2,6 +2,8 @@ import argparse
 import logging
 
 import kafka
+import psycopg2
+
 from consumer import CheckConsumer
 from producer import CheckProducer
 
@@ -19,17 +21,23 @@ def run_producer():
     )
     check_producer = CheckProducer(
         producer,
-        ["https://google.com",
-         "https://yandex.ru",
-         "https://goooogle.com"],
+        [
+            ("https://google.com", r".*"),
+            ("https://yandex.ru", r".*NEVERMATCH.*"),
+            ("https://goooogle.com", None)
+        ],
         "webmonitor",
         1
-    )
-    check_producer.monitor()
+    ) #yapf: disable
+    check_producer.start()
 
 
 def run_consumer():
     """Run WebMonitor consumer"""
+    connection = psycopg2.connect(
+        "postgres://avnadmin:ammgx5763fo3z4hf@pg-3987c8a8-axeoman-a287.aivencloud.com:29938/defaultdb?sslmode=require"
+    )
+
     consumer = kafka.KafkaConsumer(
         "webmonitor",
         group_id="group1",
@@ -39,8 +47,8 @@ def run_consumer():
         ssl_certfile="service.cert",
         ssl_keyfile="service.key",
     )
-    check_consumer = CheckConsumer("", consumer)
-    check_consumer.consume()
+    check_consumer = CheckConsumer(connection, consumer, "webmonitor")
+    check_consumer.start()
 
 
 if __name__ == "__main__":

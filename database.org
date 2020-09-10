@@ -1,0 +1,29 @@
+* Metrics
+** SELECT all
+#+begin_src sql
+SELECT * FROM webmonitor_metrics
+ORDER BY id desc;
+#+end_src
+
+#+RESULTS:
+
+** DROP table
+#+begin_src sql
+DROP TABLE webmonitor_metrics CASCADE;
+#+end_src
+
+#+RESULTS:
+* Regexp
+** SELECT all
+#+begin_src sql
+SELECT * FROM webmonitor_regexp
+ORDER BY id desc;
+#+end_src
+
+#+RESULTS:
+** DROP table
+#+begin_src sql
+DROP TABLE webmonitor_regexp CASCADE;
+#+end_src
+
+#+RESULTS:
