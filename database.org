@@ -16,7 +16,7 @@ DROP TABLE webmonitor_metrics CASCADE;
 * Regexp
 ** SELECT all
 #+begin_src sql
-SELECT * FROM webmonitor_regexp
+SELECT * FROM webmonitor_regexps
 ORDER BY id desc;
 #+end_src
 
@@ -24,6 +24,28 @@ ORDER BY id desc;
 ** DROP table
 #+begin_src sql
 DROP TABLE webmonitor_regexp CASCADE;
+#+end_src
+
+#+RESULTS:
+* Urls
+** SELECT all
+#+begin_src sql
+SELECT * FROM webmonitor_urls
+ORDER BY id desc;
+#+end_src
+
+#+RESULTS:
+** DROP table
+#+begin_src sql
+DROP TABLE webmonitor_urls CASCADE;
+#+end_src
+
+#+RESULTS:
+* All joined
+#+begin_src sql
+SELECT m.id, m.time, u.url, m.connection_error, m.response_time, r.pattern, m.regexp_matched  FROM webmonitor_metrics m
+JOIN webmonitor_regexps r on r.id = m.regexp_id
+JOIN webmonitor_urls u on u.id = m.url_id
 #+end_src
 
 #+RESULTS:

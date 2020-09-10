@@ -3,7 +3,7 @@ Check desired website and log metrics into Kafka topic.
 """
 import logging
 from time import sleep
-from typing import List, Union, Optional, Tuple
+from typing import Optional, Tuple
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -31,22 +31,14 @@ class CheckProducer:
     def gather_and_send(self, url: str, regexp: Optional[str]):
         """Gather metrics and send into kafka topic"""
         while True:
-            try:
-                self._logger.info("Checking availability of %s", url)
-                result = WebChecker.check_url(url, timeout=2, regexp=regexp)
-                metadata = self._producer.send(
-                    self._topic,
-                    result.dumps().encode()
-                )
-                self._logger.info("Got Kafka metadata: %s", metadata)
-            except Exception as exc:  # Make exception not such broad
-                self._logger.error(
-                    'Checking %s generated an exception: %s',
-                    url,
-                    exc
-                )
-            finally:
-                sleep(self._interval)
+
+            self._logger.info("Checking availability of %s", url)
+            result = WebChecker.check_url(url, regexp=regexp)
+            metadata = self._producer.send(
+                self._topic,
+                result.dumps().encode()
+            )
+            self._logger.info("Got Kafka metadata: %s", metadata)
 
     def start(self):
         """Runs infinite monitoring loop with configured parameters"""

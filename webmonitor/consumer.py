@@ -1,18 +1,20 @@
 """Container for CheckConsumer class"""
 import logging
-import psycopg2
+from datetime import datetime
 
 import kafka
 
 from webchecker import WebCheckResult
 from sql import (
     INSERT_METRICS_RESULT,
-    INSERT_REGEXP_RESULT,
+    INSERT_REGEXP,
+    INSERT_URL,
     INIT_METRICS_TABLE,
-    INIT_REGEXP_TABLE,
-    SELECT_REGEXP
+    INIT_REGEXPS_TABLE,
+    INIT_URLS_TABLE,
+    SELECT_REGEXPS,
+    SELECT_URLS
 )
-from datetime import datetime
 
 
 class CheckConsumer:
@@ -31,7 +33,7 @@ class CheckConsumer:
         self._table_prefix = table_prefix
 
         if create_table:
-            self._create_table()
+            self._create_tables()
 
     def _handle_message(self, message):
         """Deserialize recieved message and save to database"""
@@ -41,11 +43,12 @@ class CheckConsumer:
             datetime.fromtimestamp(message.timestamp / 1000)
         )
 
-    def _create_table(self):
+    def _create_tables(self):
         """Create table for metrics data if not exists"""
         self._logger.info("Creating database table if not exists...")
         cursor = self._db_connection.cursor()
-        cursor.execute(INIT_REGEXP_TABLE.format(prefix=self._table_prefix))
+        cursor.execute(INIT_REGEXPS_TABLE.format(prefix=self._table_prefix))
+        cursor.execute(INIT_URLS_TABLE.format(prefix=self._table_prefix))
         cursor.execute(INIT_METRICS_TABLE.format(prefix=self._table_prefix))
 
         self._db_connection.commit()
@@ -54,40 +57,62 @@ class CheckConsumer:
     def _save_to_database(self, check_result: WebCheckResult, time: datetime):
         """Save result to database"""
         cursor = self._db_connection.cursor()
-
-        if check_result.regexp:
-            # Have to do this because ON `CONFLICT DO NOTHING RETURNING id`
-            # returns NULL when no entry was updated
-            cursor.execute(
-                SELECT_REGEXP.format(prefix=self._table_prefix),
-                (check_result.regexp,
-                 )
-            )
-
-            if result := cursor.fetchone():
-                regexp_id = result[0]
-            else:
-                regexp_id = cursor.execute(
-                    INSERT_REGEXP_RESULT.format(prefix=self._table_prefix),
-                    (check_result.regexp,
-                     )
-                )
-
-        else:
-            regexp_id = None
-
+        regexp_id = self._get_regexp_id(check_result.regexp, cursor)
+        url_id = self._get_url_id(check_result.url, cursor)
         cursor.execute(
             INSERT_METRICS_RESULT.format(prefix=self._table_prefix),
             (
+                url_id,
                 check_result.status_code,
                 check_result.response_time,
                 regexp_id,
                 check_result.regexp_matched,
+                check_result.connection_error,
                 time
             )
         )
         self._db_connection.commit()
         cursor.close()
+
+    def _get_regexp_id(self, pattern, cursor) -> int:
+        """Get or create regexp id"""
+        if pattern:
+
+            cursor.execute(
+                SELECT_REGEXPS.format(prefix=self._table_prefix),
+                (pattern,
+                 )
+            )
+            if result := cursor.fetchone():
+                regexp_id = result[0]
+            else:
+                cursor.execute(
+                    INSERT_REGEXP.format(prefix=self._table_prefix),
+                    (pattern,
+                     )
+                )
+                regexp_id = cursor.fetchone()[0]
+
+        else:
+            regexp_id = None
+
+        return regexp_id
+
+    def _get_url_id(self, url, cursor) -> int:
+        """Get or create url id"""
+
+        cursor.execute(SELECT_URLS.format(prefix=self._table_prefix), (url, ))
+        if result := cursor.fetchone():
+            url_id = result[0]
+        else:
+            cursor.execute(
+                INSERT_URL.format(prefix=self._table_prefix),
+                (url,
+                 )
+            )
+            url_id = cursor.fetchone()[0]
+
+        return url_id
 
     def start(self):
         """Save serialized WebCheckResult into database"""

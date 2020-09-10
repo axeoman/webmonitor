@@ -12,8 +12,10 @@ import requests
 @dataclass
 class WebCheckResult:
     """Data class for web monitor metrics"""
-    status_code: int
-    response_time: int
+    url: str
+    status_code: Optional[int] = None
+    response_time: Optional[int] = None
+    connection_error: Optional[bool] = False
     regexp: Optional[str] = None
     regexp_matched: Optional[bool] = None
 
@@ -36,20 +38,28 @@ class WebChecker:
         cls,
         url: str,
         regexp: Optional[str] = None,
-        timeout: Optional[int] = None
     ) -> WebCheckResult:
         """Check url for availablity."""
 
-        resp = requests.get(url, timeout=timeout)
+        try:
+            resp = requests.get(url, timeout=(2, 60))
+        except requests.exceptions.RequestException as exc:
+            cls._logger.warning(
+                "Check url: %s raised exception: %s ",
+                url,
+                exc
+            )
+            result = WebCheckResult(url=url, connection_error=True)
+        else:
+            result = WebCheckResult(
+                url=url,
+                status_code=resp.status_code,
+                response_time=resp.elapsed.microseconds,
+            )
 
-        result = WebCheckResult(
-            status_code=resp.status_code,
-            response_time=resp.elapsed.microseconds,
-        )
-
-        if regexp:
-            result.regexp = regexp
-            result.regexp_matched = cls._match_regexp(regexp, resp.text)
+            if regexp:
+                result.regexp = regexp
+                result.regexp_matched = cls._match_regexp(regexp, resp.text)
 
         return result
 
