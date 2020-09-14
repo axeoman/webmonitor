@@ -1,20 +1,13 @@
-* webmonitor producer
-Check desired website and log metrics into Kafka topic. 
-** parameters
-- website urls
-- kafka credentials?
-- kafka topic 
-- kafka partition
-- body regex
-** tasks
-- [ ] configuration
-- [ ] catch exceptions
-- [ ] producer monitoring
+* Tasks
+- [X] configuration file
+- [X] catch requests exceptions
 - [ ] tests
+- [ ] packaging
 - [ ] logs
+- [ ] producer monitoring
+- [ ] better doc strings
+- [ ] command arguments instead of file
+- [ ] configuration file validation
 
-* webmonitor consumer
-Consume topic website metrics and save to PostgreSQL database.
-** parameters
-- kafka topic
-- database credentials
+
+

@@ -1,0 +1,26 @@
+kafka:
+  host: localhost
+  port: 9092
+  ssl_cafile: /path/to/file
+  ssl_certfile: /path/to/file
+  ssl_keyfile: /path/to/file
+  topic: webmonitor
+  consumer_group: saver01
+  
+postgresql:
+  host: localhost
+  port: 5432
+  database: defaultdb
+  username: username
+  password: password
+  sslmode: require
+  table_prefix: webmonitor
+
+websites:
+  - url: google.com
+    regexp: '.*'
+  - url: aiven.com
+    regexp: null
+  - url: goooogle.com
+    regexp: '^NEVERMATCH$'
+  

@@ -3,9 +3,10 @@ Check desired website and log metrics into Kafka topic.
 """
 import logging
 from time import sleep
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from configuration import WebSiteRules
 
 import kafka
 from webchecker import WebChecker
@@ -18,17 +19,14 @@ class CheckProducer:
     def __init__(
         self,
         producer: kafka.KafkaProducer,
-        websites: Tuple[str,
-                        Optional[str]],
+        websites: List[WebSiteRules],
         topic: str,
-        interval: int
     ):
         self._producer = producer
         self._websites = websites
         self._topic = topic
-        self._interval = interval
 
-    def gather_and_send(self, url: str, regexp: Optional[str]):
+    def gather_and_send(self, url: str, regexp: Optional[str], interval: int):
         """Gather metrics and send into kafka topic"""
         while True:
 
@@ -39,6 +37,7 @@ class CheckProducer:
                 result.dumps().encode()
             )
             self._logger.info("Got Kafka metadata: %s", metadata)
+            sleep(interval)
 
     def start(self):
         """Runs infinite monitoring loop with configured parameters"""
@@ -50,13 +49,13 @@ class CheckProducer:
         with ThreadPoolExecutor() as executor:
             futures = list()
             for website in self._websites:
-                if len(website) > 1:
-                    url, regexp = website
-                else:
-                    url = website
-                    regexp = None
 
-                future = executor.submit(self.gather_and_send, url, regexp)
+                future = executor.submit(
+                    self.gather_and_send,
+                    website.url,
+                    website.regexp,
+                    website.interval
+                )
                 futures.append(future)
 
         for future in as_completed(futures):

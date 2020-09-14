@@ -75,7 +75,7 @@ class CheckConsumer:
         cursor.close()
 
     def _get_regexp_id(self, pattern, cursor) -> int:
-        """Get or create regexp id"""
+        """Get or create regexp entry and return its id"""
         if pattern:
 
             cursor.execute(
@@ -99,7 +99,7 @@ class CheckConsumer:
         return regexp_id
 
     def _get_url_id(self, url, cursor) -> int:
-        """Get or create url id"""
+        """Get or create url entry and return its id"""
 
         cursor.execute(SELECT_URLS.format(prefix=self._table_prefix), (url, ))
         if result := cursor.fetchone():
