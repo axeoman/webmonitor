@@ -3,7 +3,7 @@ Check desired website and log metrics into Kafka topic.
 """
 import logging
 from time import sleep
-from typing import Optional, Tuple, List
+from typing import Optional, List
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from configuration import WebSiteRules
@@ -49,7 +49,6 @@ class CheckProducer:
         with ThreadPoolExecutor() as executor:
             futures = list()
             for website in self._websites:
-
                 future = executor.submit(
                     self.gather_and_send,
                     website.url,

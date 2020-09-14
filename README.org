@@ -3,7 +3,7 @@
 - [X] catch requests exceptions
 - [ ] tests
 - [ ] packaging
-- [ ] logs
+- [ ] logging configuration
 - [ ] producer monitoring
 - [ ] better doc strings
 - [ ] command arguments instead of file

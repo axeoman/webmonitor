@@ -1,16 +1,32 @@
+"""Inital configuration, parse command arguments and run specified component"""
 import os
-import xdg
 import argparse
 import logging
 
 import kafka
 import psycopg2
+import xdg
 
 from consumer import CheckConsumer
 from producer import CheckProducer
-from configuration import parse_config, WebMonitorConfig
+from configuration import parse_config, WebMonitorConfig, CONFIG_TEMPLATE
 
-SERVER = "kafka-3603f4b2-axeoman-a287.aivencloud.com:29940"
+
+def main():
+    """Entry point for service start"""
+    logging.basicConfig(level=logging.INFO)
+
+    args = create_argparser().parse_args()
+    app_config = parse_config(args.config)
+
+    if args.generate_config:
+        print(CONFIG_TEMPLATE)
+        return
+
+    if args.component == "checker":
+        run_producer(app_config)
+    elif args.component == "saver":
+        run_consumer(app_config)
 
 
 def run_producer(config: WebMonitorConfig):
@@ -80,17 +96,14 @@ def create_argparser() -> argparse.ArgumentParser:
             "Default: ${XDG_CONFIG_HOME}/webmonitor.yml"
         )
     )
+    parser.add_argument(
+        "--generate_config",
+        action="store_true",
+        help=("Generates config template and print out into sys.stdin")
+    )
 
     return parser
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-
-    args = create_argparser().parse_args()
-    app_config = parse_config(args.config)
-
-    if args.component == "checker":
-        run_producer(app_config)
-    elif args.component == "saver":
-        run_consumer(app_config)
+    main()

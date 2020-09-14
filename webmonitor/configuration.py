@@ -1,3 +1,6 @@
+"""
+Provides configuration models and parse function for YAML config file
+"""
 from dataclasses import dataclass
 from typing import List
 
@@ -6,6 +9,35 @@ try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
+
+CONFIG_TEMPLATE = \
+"""kafka:
+  host: localhost
+  port: 9092
+  ssl_cafile: /path/to/ca.pem
+  ssl_certfile: /path/to/service.cert
+  ssl_keyfile: /path/to/service.key
+  topic: webmonitor
+  consumer_group: webmonitor_saver01
+
+postgresql:
+  host: localhost
+  port: 5432
+  database: defaultdb
+  username: username
+  password: password
+  sslmode: require
+  table_prefix: webmonitor
+
+websites:
+  - url: https://google.com
+    regexp: '.*'
+    interval: 1
+  - url: https://aiven.com
+    interval: 10
+  - url: https://goooogle.com
+    regexp: '^NEVERMATCH$'
+"""
 
 
 @dataclass
