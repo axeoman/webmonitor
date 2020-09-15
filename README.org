@@ -51,10 +51,10 @@ websites:
 #+end_src
 
 * Run
-You can run `checker` and `saver` component.
-`checker` - kafka consumer checks every website mentioned in config file for
+You can run `checker` and `saver` components:
+- `checker` - kafka consumer checks every website mentioned in config file for
 availability and pushes metrics to kafka topic
-`saver` - kafka producer reads topic and saves metrics into PostgreSQL database
+- `saver` - kafka producer reads topic and saves metrics into PostgreSQL database
 
 #+begin_src sh
 webmonitor checker -c config.yml

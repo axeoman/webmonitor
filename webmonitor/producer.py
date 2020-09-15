@@ -39,6 +39,10 @@ class CheckProducer:
                 result.dumps().encode()
             )
             self._logger.info("Got Kafka metadata: %s", metadata)
+
+            if interval is None:
+                break
+
             sleep(interval)
 
     def start(self):
