@@ -31,5 +31,8 @@ setup(
         'console_scripts': [
             'webmonitor=webmonitor.__main__:main',
         ],
-    }
+    },
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest',
+                   'responses'],
 )

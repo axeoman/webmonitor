@@ -3,7 +3,7 @@ Check desired website and log metrics into Kafka topic.
 """
 import logging
 from time import sleep
-from typing import Optional, List
+from typing import Optional, List, Type
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -21,7 +21,7 @@ class CheckProducer:
         producer: kafka.KafkaProducer,
         websites: List[WebSiteRules],
         topic: str,
-        webchecker=WebChecker
+        webchecker: Type = WebChecker
     ):
         self._producer = producer
         self._websites = websites
