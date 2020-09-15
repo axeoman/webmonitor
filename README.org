@@ -1,3 +1,6 @@
+#+TITLE: WebMonitor
+#+AUTHOR: Atavin Aleksey
+
 This is a test assignment for a job interview.
  
 Task is to implement a system that monitors website availability over the
@@ -70,6 +73,7 @@ webmonitor saver -c config.yml
 - [ ] Add a proper way to SIGTERM handling
 - [ ] Doc strings on some functions lack information about arguments
 - [ ] Add support command arguments instead of a config file
+
 
 
 
