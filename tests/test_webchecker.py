@@ -35,3 +35,17 @@ def test_check_url(
     assert result.regexp == regexp
     assert result.regexp_matched == regexp_matched
     assert result.connection_error == connection_error
+
+
+def test_loads_dumps():
+    """Check that loads and dumps methods are compatible"""
+
+    result = WebCheckResult(
+        url="https://aiven.com",
+        status_code=200,
+        regexp=".*",
+        regexp_matched=True,
+        connection_error=False
+    )
+
+    assert result == result.loads(result.dumps())
