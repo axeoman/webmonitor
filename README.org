@@ -71,14 +71,15 @@ python3.8 setup.py test
 
 
 * Improvements need to be done
-- [ ] Tests
-- [ ] Add topic messages validation
+- [ ] Add a bunch of tests and create tox configuration
+- [ ] Add messages protocol validation
 - [ ] Add flexible logging configuration
 - [ ] Add Sentry logging handler for decent service monitoring
 - [ ] Add configuration file validation
 - [ ] Add a proper way to SIGTERM handling
 - [ ] Doc strings on some functions lack information about arguments
 - [ ] Add support command arguments instead of a config file
+- [ ] Add docker packaging
 
 
 
