@@ -1,13 +1,75 @@
-* Tasks
-- [X] configuration file
-- [X] catch requests exceptions
-- [ ] tests
-- [ ] packaging
-- [ ] logging configuration
-- [ ] producer monitoring
-- [ ] better doc strings
-- [ ] command arguments instead of file
-- [ ] configuration file validation
+This is a test assignment for a job interview.
+ 
+Task is to implement a system that monitors website availability over the
+network, produces metrics about this and passes these events through an 
+Kafka instance into an PostgreSQL database.
+
+Metrics are: 
+- site availability 
+- HTTP status code 
+- response time
+- regexp pattern match
+
+* Install
+#+begin_src sh
+cd /tmp/
+git clone 
+python3.8 -m pip install git+https://github.com/axeoman/webmonitor.git
+#+end_src
+* Configuration
+You can generate template of a config file with `--generate_config` command as follows:
+#+begin_src sh
+$ webmonitor --generate_config
+host: localhost
+  port: 9092
+  ssl_cafile: /path/to/ca.pem
+  ssl_certfile: /path/to/service.cert
+  ssl_keyfile: /path/to/service.key
+  topic: webmonitor
+  consumer_group: webmonitor_saver01
+
+postgresql:
+  host: localhost
+  port: 5432
+  database: defaultdb
+  username: username
+  password: password
+  sslmode: require
+  table_prefix: webmonitor
+
+websites:
+  - url: https://google.com
+    regexp: '.*'
+    interval: 1
+  - url: https://aiven.com
+    interval: 10
+  - url: https://goooogle.com
+    regexp: '^NEVERMATCH$'
+#+end_src
+
+* Run
+You can run `checker` and `saver` component.
+`checker` - kafka consumer checks every website mentioned in config file for
+availability and pushes metrics to kafka topic
+`saver` - kafka producer reads topic and saves metrics into PostgreSQL database
+
+#+begin_src sh
+webmonitor checker -c config.yml
+#+end_src
+
+#+begin_src sh
+webmonitor saver -c config.yml
+#+end_src
+
+* Improvements need to be done
+- [ ] Tests
+- [ ] Add topic messages validation
+- [ ] Add flexible logging configuration
+- [ ] Add Sentry logging handler for decent service monitoring
+- [ ] Add configuration file validation
+- [ ] Add a proper way to SIGTERM handling
+- [ ] Doc strings on some functions lack information about arguments
+- [ ] Add support command arguments instead of a config file
 
 
 

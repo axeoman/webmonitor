@@ -14,8 +14,9 @@ setup(
     author="Atavin Alexey",
     author_email="axeoman@gmail.com",
     packages=find_packages(exclude=["tests"]),
+    python_requires='>=3.8',
     install_requires=[
-        "psycorg2==2.8.6",
+        "psycopg2==2.8.6",
         "kafka-python==2.0.1",
         "requests==2.24.0",
         "xdg==4.0.1",
@@ -28,7 +29,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'webmonitor=webmonitor:main',
+            'webmonitor=webmonitor.__main__:main',
         ],
     }
 )

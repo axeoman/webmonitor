@@ -7,9 +7,9 @@ import kafka
 import psycopg2
 import xdg
 
-from consumer import CheckConsumer
-from producer import CheckProducer
-from configuration import parse_config, WebMonitorConfig, CONFIG_TEMPLATE
+from .consumer import CheckConsumer
+from .producer import CheckProducer
+from .configuration import parse_config, WebMonitorConfig, CONFIG_TEMPLATE
 
 
 def main():
@@ -17,11 +17,11 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     args = create_argparser().parse_args()
-    app_config = parse_config(args.config)
-
     if args.generate_config:
         print(CONFIG_TEMPLATE)
         return
+
+    app_config = parse_config(args.config)
 
     if args.component == "checker":
         run_producer(app_config)

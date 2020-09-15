@@ -4,8 +4,8 @@ from datetime import datetime
 
 import kafka
 
-from webchecker import WebCheckResult
-from sql import (
+from .webchecker import WebCheckResult
+from .sql import (
     INSERT_METRICS_RESULT,
     INSERT_REGEXP,
     INSERT_URL,

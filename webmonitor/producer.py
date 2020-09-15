@@ -6,10 +6,10 @@ from time import sleep
 from typing import Optional, List
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from configuration import WebSiteRules
 
 import kafka
-from webchecker import WebChecker
+from .webchecker import WebChecker
+from .configuration import WebSiteRules
 
 
 class CheckProducer:
@@ -21,17 +21,19 @@ class CheckProducer:
         producer: kafka.KafkaProducer,
         websites: List[WebSiteRules],
         topic: str,
+        webchecker=WebChecker
     ):
         self._producer = producer
         self._websites = websites
         self._topic = topic
+        self._webchecker = webchecker
 
     def gather_and_send(self, url: str, regexp: Optional[str], interval: int):
         """Gather metrics and send into kafka topic"""
         while True:
 
             self._logger.info("Checking availability of %s", url)
-            result = WebChecker.check_url(url, regexp=regexp)
+            result = self._webchecker.check_url(url, regexp=regexp)
             metadata = self._producer.send(
                 self._topic,
                 result.dumps().encode()
